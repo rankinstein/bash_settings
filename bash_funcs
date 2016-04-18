@@ -1,0 +1,43 @@
+function my_ip() # Get IP adress on ethernet. 
+{ 
+    MY_IP=$(/sbin/ifconfig en0 | awk '/inet/ { print $2 } ' | sed -e s/addr://); 
+echo ${MY_IP:-"Not connected"}
+}
+
+function mountnas (){
+if [ $# -eq 1 ]; then
+    mkdir /Volumes/$1
+    mount_smbfs //guest@nas/$1 /Volumes/$1
+    return 0
+fi
+echo "mount: [Backups, Music, Movies, Documents]"
+}
+
+function env (){
+    if [ $# -eq 1 ]; then
+        /usr/bin/env | grep $1
+    else
+        /usr/bin/env
+    fi
+}
+
+
+# make a directory and enter it
+mkdircd(){ mkdir "$1" && cd "$1" ; }
+
+function rename_mp3(){
+    find . -name "*.mp3" -exec eyed3 --rename '$artist - $album - $title' '{}' \;
+}
+
+function color_my_prompt {
+    local __user_and_host="\[\033[01;32m\]\u@\h"
+    local __cur_location="\[\033[01;34m\]\w"
+    local __git_branch_color="\[\033[31m\]"
+    local __git_branch='`git branch 2> /dev/null | grep -e ^* | sed -E  s/^\\\\\*\ \(.+\)$/\(\\\\\1\)\ /`'
+    local __prompt_tail="\[\033[35m\]$"
+    local __last_color="\[\033[00m\]"
+    export PS1="$__cur_location $__git_branch_color$__git_branch$__prompt_tail$__last_color "
+}
+color_my_prompt
+
+
